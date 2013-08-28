@@ -152,7 +152,6 @@ public class StaggeredGridView extends ViewGroup {
 	private int mColWidth;
 	private long mFirstAdapterId;
 	private boolean mBeginClick;
-	private boolean mSmoothScrollbarEnabled = true;
 
 	private FastScroller mFastScroller;
 	private boolean mFastScrollEnabled = true;
@@ -488,34 +487,7 @@ public class StaggeredGridView extends ViewGroup {
 
 	@Override
 	protected int computeVerticalScrollExtent() {
-		final int count = getChildCount();
-		if (count > 0) {
-			if (mSmoothScrollbarEnabled) {
-				int extent = count * 100;
-
-				View view = getChildAt(0);
-				// final int top = view.getTop();
-				final int top = getFillChildTop();
-
-				int height = view.getHeight();
-				if (height > 0) {
-					extent += (top * 100) / height;
-				}
-
-				view = getChildAt(count - 1);
-				// final int bottom = view.getBottom();
-				final int bottom = getScrollChildBottom();
-				height = view.getHeight();
-				if (height > 0) {
-					extent -= ((bottom - getHeight()) * 100) / height;
-				}
-
-				return extent;
-			} else {
-				return 1;
-			}
-		}
-		return 0;
+        return super.computeVerticalScrollExtent();
 	}
 
 	@Override
@@ -523,7 +495,7 @@ public class StaggeredGridView extends ViewGroup {
 		final int firstPosition = mFirstPosition;
 		final int childCount = getChildCount();
 		if (firstPosition >= 0 && childCount > 0) {
-			if (mSmoothScrollbarEnabled) {
+			if (super.isVerticalScrollBarEnabled()) {
 				final View view = getChildAt(0);
 				// final int top = view.getTop();
 				final int top = getFillChildTop();
@@ -531,7 +503,7 @@ public class StaggeredGridView extends ViewGroup {
 				if (height > 0) {
 					return Math.max(firstPosition
 							* 100
-							- (top * 100)
+							- (top * 100 * mColCount)
 							/ height
 							+ (int) ((float) getScrollY() / getHeight()
 									* mItemCount * 100), 0);
@@ -572,7 +544,7 @@ public class StaggeredGridView extends ViewGroup {
 	@Override
 	protected int computeVerticalScrollRange() {
 		int result;
-		if (mSmoothScrollbarEnabled) {
+		if (super.isVerticalScrollBarEnabled()) {
 			result = Math.max(mItemCount * 100, 0);
 		} else {
 			result = mItemCount;
